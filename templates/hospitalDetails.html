@@ -1,1 +1,37 @@
-<ion-view></ion-view>
+<ion-view>
+	<ion-tabs class="tabs-positive tabs-icon-only">
+
+  <ion-tab title="Info" icon-on="ion-ios-filing" icon-off="ion-ios-filing-outline">
+    <!-- Tab 1 content -->
+  	<div class="hospDet-hosp">
+  		<div class="hospDet-hosp-name">{{hospital.hosp_name}}</div>
+  		<div class="hospDet-hosp-call">Icon</div>
+  		
+  	</div>
+  	<div class="hospDet-addr">
+  		<div class="hospDet-label">Address</div>
+  		<div class="hospDet-text">{{hospital.hosp_addr}}</div>
+  	</div>
+  	<div class="hospDet-phone">
+  		<div class="hospDet-label">Phone</div>
+  		<div class="hospDet-text">{{hospital.hosp_phone}}</div>
+  	</div>
+  </ion-tab>
+
+  <ion-tab title="Rooms" icon-on="ion-ios-clock" icon-off="ion-ios-clock-outline">
+    <div class="coming-soon">
+    	Coming Soon
+    </div>
+  </ion-tab>
+
+  <ion-tab title="Contacts" icon-on="ion-ios-gear" icon-off="ion-ios-gear-outline">
+    <!-- Tab 3 content -->
+    <div class="coming-soon">
+    	Coming Soon
+    </div>
+  </ion-tab>
+
+</ion-tabs>
+	
+	
+</ion-view>

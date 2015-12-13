@@ -1,8 +1,13 @@
 <ion-view title="Emirates">
     <ion-content>
+    	<div class="emir-head">
+    			Emirates
+    	</div>
         <ion-list>
-            <ion-item ng-repeat="emirate in emirates" href="#/explore/{{expItem.id}}">
-                {{emirate.emirate_name}}
+            <ion-item ng-repeat="emirate in emirates" href="#/hospital/{{emirate.type}}/{{emirate.id}}">
+            	<div class="emir-name">
+                	{{emirate.emirate_name}}
+                </div>
             </ion-item>
         </ion-list>
     </ion-content>

@@ -34,7 +34,7 @@ hospitalApp.config(function($stateProvider, $urlRouterProvider) {
             controller: 'MenuCtrl'
         })
         .state('explore', {
-            url: '/explore/:id',
+            url: '/explore',
             templateUrl: 'templates/explore.html',
             controller: 'ExploreCtrl'
         })
@@ -48,20 +48,27 @@ hospitalApp.config(function($stateProvider, $urlRouterProvider) {
             templateUrl: 'templates/hospitaltype.html',
             controller: 'HospTypeCtrl'
         })
-        .state('hospitals', {
-            url: '/emirates/:emirateId',
+        .state('hospital', {
+            url: '/hospital/:type/:Id',
+            templateUrl: 'templates/hospitals.html',
+            controller: 'HospitalCtrl'
+        })
+        /*
+        .state('hospital-hosptype', {
+            url: '/hospital/:type/:Id',
             templateUrl: 'templates/hospitals.html',
             controller: 'HospitalCtrl'
         })
         .state('hospitals', {
-            url: '/hosptype/:hospTypeId',
+            url: '/hospital',
             templateUrl: 'templates/hospitals.html',
             controller: 'HospitalCtrl'
         })
-        .state('hospitals', {
-            url: '/provider',
-            templateUrl: 'templates/hospitals.html',
-            controller: 'HospitalCtrl'
+        */
+        .state('hospital-details', {
+            url: '/hospitaldetails/:id',
+            templateUrl: 'templates/hospitalDetails.html',
+            controller: 'HospitalDetCtrl'
         })
         .state('documents', {
             url: '/documents',
@@ -132,9 +139,9 @@ hospitalApp.controller("MenuCtrl", function($scope, $ionicPlatform, $ionicLoadin
             	// Hospitals
                 tx.executeSql("DROP TABLE IF EXISTS tblHospitals");
                 //tx.executeSql("CREATE TABLE IF NOT EXISTS tblCategories (id integer primary key, category_name text)");
-                tx.executeSql("CREATE TABLE IF NOT EXISTS tblHospitals (id integer primary key, hosp_lat integer, hosp_lon integer, hosp_name text, hosp_area text, hosp_type text, hosp_emirate text)");
+                tx.executeSql("CREATE TABLE IF NOT EXISTS tblHospitals (id integer primary key, hosp_lat integer, hosp_lon integer, hosp_name text, hosp_area text, hosp_addr text, hosp_phone text, hosp_type_id int, hosp_emirate_id int)");
                 //tx.executeSql("CREATE TABLE IF NOT EXISTS tblTodoListItems (id integer primary key, todo_list_id integer, todo_list_item_name text)");
-                tx.executeSql("INSERT INTO tblHospitals (hosp_lat,hosp_lon,hosp_name,hosp_area,hosp_type,hosp_emirate) VALUES (?,?,?,?,?,?)", ["100","100","Emirates International Hospital","Al Ain Main Street","Hospital","Dubai"]);
+                tx.executeSql("INSERT INTO tblHospitals (hosp_lat,hosp_lon,hosp_name,hosp_area,hosp_addr,hosp_phone,hosp_type_id,hosp_emirate_id) VALUES (?,?,?,?,?,?,?,?)", ["100","100","Emirates International Hospital","Al Ain Main Street","Al Ain Main Street","9820082828","1","1"]);
                 //tx.executeSql("INSERT INTO tblCategories (category_name) VALUES (?)", ["Chores"]);
                 //tx.executeSql("INSERT INTO tblCategories (category_name) VALUES (?)", ["School"]);
             });
@@ -145,7 +152,7 @@ hospitalApp.controller("MenuCtrl", function($scope, $ionicPlatform, $ionicLoadin
     });
 });
  
-hospitalApp.controller("ExploreCtrl", function($scope, $ionicPlatform, $cordovaSQLite) {
+hospitalApp.controller("ExploreCtrl", function($scope, $ionicPlatform, $cordovaSQLite, $window, $location) {
 
  	$scope.expItems = [{"id":"1", "img": "images/explore.png", "title": "EMIRATES", "subtitle": "Hospitals by Emirates"},
 				{"id":"2", "img": "images/document.png", "title": "TYPE", "subtitle": "Hospitals by Type"}, 
@@ -153,11 +160,12 @@ hospitalApp.controller("ExploreCtrl", function($scope, $ionicPlatform, $cordovaS
 				
     $scope.getExpItems = function (id) {
     	if(id == 1) {
-        	$window.location.href = ('#/emirates');
+        	$location.path('/emirates');
     	} else if(id == 2) {
-    		$window.location.href = ('#/hospitaltype');
+    		$location.path('/hospitaltype');
     	} else {
-    		$window.location.href = ('#/provider');
+    		$location.path('/hospital/hosp/0');
+    		
     	}
     }
 
@@ -172,7 +180,7 @@ hospitalApp.controller("EmiratesCtrl", function($scope, $ionicPlatform, $ionicPo
         $cordovaSQLite.execute(db, query, []).then(function(res) {
             if(res.rows.length > 0) {
                 for(var i = 0; i < res.rows.length; i++) {
-                    $scope.emirates.push({id: res.rows.item(i).id, emirate_name: res.rows.item(i).emirate_name});
+                    $scope.emirates.push({id: res.rows.item(i).id, emirate_name: res.rows.item(i).emirate_name, type: "emir"});
                 }
             }
         }, function (err) {
@@ -189,7 +197,7 @@ hospitalApp.controller("HospTypeCtrl", function($scope, $ionicPlatform, $ionicPo
         $cordovaSQLite.execute(db, query, []).then(function(res) {
             if(res.rows.length > 0) {
                 for(var i = 0; i < res.rows.length; i++) {
-                    $scope.hospTypes.push({id: res.rows.item(i).id, type_name: res.rows.item(i).type_name});
+                    $scope.hospTypes.push({id: res.rows.item(i).id, type_name: res.rows.item(i).type_name, type: "hosptype"});
                 }
             }
         }, function (err) {
@@ -202,13 +210,42 @@ hospitalApp.controller("HospitalCtrl", function($scope, $ionicPlatform, $ionicPo
   	$scope.hospitals = [];
  
     $ionicPlatform.ready(function() {
-        var query = "SELECT id, hosp_name FROM tblHospitals";
-        $cordovaSQLite.execute(db, query, []).then(function(res) {
+    	var query = "";
+    	if($stateParams.type == "emir") {
+        	query = "SELECT id, hosp_name, hosp_area, hosp_addr, hosp_phone FROM tblHospitals where hosp_emirate_id = ?";
+    	} else if($stateParams.type == "hosptype") {
+    		query = "SELECT id, hosp_name, hosp_area, hosp_addr, hosp_phone FROM tblHospitals where hosp_type_id = ?";
+    	
+    	} else {
+    		query = "SELECT id, hosp_name, hosp_area, hosp_addr, hosp_phone FROM tblHospitals where hosp_type_id<>?";
+    	}
+        $cordovaSQLite.execute(db, query, [$stateParams.Id]).then(function(res) {
             if(res.rows.length > 0) {
                 for(var i = 0; i < res.rows.length; i++) {
-                    $scope.hospitals.push({id: res.rows.item(i).id, hosp_name: res.rows.item(i).hosp_name, hosp_area: res.rows.item(i).hosp_area});
+                    $scope.hospitals.push({id: res.rows.item(i).id, hosp_name: res.rows.item(i).hosp_name, hosp_area: res.rows.item(i).hosp_area, hosp_addr: res.rows.item(i).hosp_addr, hosp_phone: res.rows.item(i).hosp_phone});
                 }
             }
+        }, function (err) {
+            console.error(err);
+        });
+    });
+});
+
+
+hospitalApp.controller("HospitalDetCtrl", function($scope, $ionicPlatform, $ionicPopup, $cordovaSQLite, $stateParams) {
+  	$scope.hospital = {};
+ 
+    $ionicPlatform.ready(function() {
+        var query = "SELECT id, hosp_name, hosp_addr, hosp_area, hosp_phone FROM tblHospitals where id=?";
+        $cordovaSQLite.execute(db, query, [$stateParams.id]).then(function(res) {
+            /*
+            if(res.rows.length > 0) {
+                for(var i = 0; i < res.rows.length; i++) {
+                    $scope.hospital.push({id: res.rows.item(i).id, hosp_name: res.rows.item(i).hosp_name, hosp_area: res.rows.item(i).hosp_area, hosp_phone: res.rows.item(i).hosp_phone, hosp_addr: res.rows.item(i).hosp_addr});
+                }
+            }
+            */
+            $scope.hospital = {id: res.rows.item(0).id, hosp_name: res.rows.item(0).hosp_name, hosp_area: res.rows.item(0).hosp_area, hosp_phone: res.rows.item(0).hosp_phone, hosp_addr: res.rows.item(0).hosp_addr};
         }, function (err) {
             console.error(err);
         });

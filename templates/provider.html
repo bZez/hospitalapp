@@ -1,1 +1,9 @@
-<ion-view></ion-view>
+<ion-view title="Hospital Types">
+    <ion-content>
+        <ion-list>
+            <ion-item ng-repeat="hospType in hospTypes" href="#/hospTypes/{{hospType.id}}">
+                {{hospType.type_name}}
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

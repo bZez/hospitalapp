@@ -1,1 +1,24 @@
-<ion-view></ion-view>
+<ion-view title="Hospital Types">
+    <ion-content>
+    	<div class="hosp-head">
+    		<div class="hosp-head-loc">
+    			Hospitals Near
+    		</div>
+    	</div>
+	    <div class="hosp-search">
+	    	<input ng-model="searchText">
+	    </div>
+
+        <ion-list>
+            <ion-item ng-repeat="hospital in hospitals | filter:searchText" href="#/hospitaldetails/{{hospital.id}}">
+            	<div class="hosp-list-left">
+            		icon
+            	</div>
+            	<div class="hosp-list-right">
+                	<div class="hosp-list-name">{{hospital.hosp_name}}</div>
+                	<div class="hosp-list-area">{{hospital.hosp_area}}</div>
+                </div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

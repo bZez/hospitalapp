@@ -1,8 +1,17 @@
 <ion-view title="Menu">
     <ion-content>
+    	<div class="menu-head">
+    		Insert the logo
+    	</div>
         <ion-list>
             <ion-item ng-repeat="menu in menus" href="#/explore">
-                {{menu.title}}
+            	<div class="menu-left">
+            		glyphicon
+            	</div>
+            	<div class="menu-right">
+                	<div class="menu-list-title">{{menu.title}}</div>
+                	<div class="menu-list-subtitle">{{expItem.subtitle}}</div>
+                </div>
             </ion-item>
         </ion-list>
     </ion-content>

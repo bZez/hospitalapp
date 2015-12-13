@@ -1,8 +1,21 @@
 <ion-view title="Explore">
     <ion-content>
+    	<div class="exp-loc">
+    		<div class="exp-loc-head">
+    			Current Location
+    		</div>
+    		<div class="exp-loc-place">
+    			You are at Mahavir Nagar
+    		</div>
+    	</div>
         <ion-list>
             <ion-item ng-repeat="expItem in expItems" ng-click="getExpItems('{{expItem.id}}')">
-                {{expItem.title}}
+            	<div class="exp-left">
+            		glyphicon
+            	</div>
+				<div class="exp-right">
+                	{{expItem.title}}
+                </div>
             </ion-item>
         </ion-list>
     </ion-content>
